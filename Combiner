@@ -1,0 +1,5 @@
+from morerssfeeds import zdnet, Darkreading
+
+while 1 == 1:
+    zdnet.TextNews()
+    Darkreading.TextNews()
