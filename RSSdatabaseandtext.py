@@ -6,15 +6,6 @@ from requests import Response
 
 
 def TextNews():
-    # links = ['https://www.theregister.com/security/headlines.rss', 'https://www.zdnet.com/news/rss.xml',
-    #          'https://www.darkreading.com/rss.xml', 'https://www.eff.org/rss/updates.xml',
-    #          'https://torrentfreak.com/feed/', 'https://nakedsecurity.sophos.com/feed',
-    #          'http://feeds.feedburner.com/TheHackersNews?format=xml', 'https://www.cyberscoop.com/feed',
-    #          'https://krebsonsecurity.com/feed/', 'https://www.hackread.com/feed/',
-    #          'https://www.cyberscoop.com/feed/', 'https://seclists.org/rss/fulldisclosure.rss',
-    #          'https://www.exploit-db.com/rss.xml', 'https://www.grahamcluley.com/feed/',
-    #          'https://www.schneier.com/blog/atom.xml', 'https://www.bleepingcomputer.com/feed/',
-    #          'https://www.welivesecurity.com/feed', 'https://threatpost.com/feed']
     links = [
         'https://www.theregister.com/security/headlines.rss', 'https://www.zdnet.com/news/rss.xml',
         'https://www.darkreading.com/rss.xml', 'https://www.eff.org/rss/updates.xml',
