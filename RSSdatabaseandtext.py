@@ -1,11 +1,24 @@
+import time
+
 import requests
 from bs4 import *
 import sqlite3
+import logging
 
 from requests import Response
 
 
 def TextNews():
+    logging.basicConfig(level=logging.CRITICAL)
+    # links = ['https://www.theregister.com/security/headlines.rss', 'https://www.zdnet.com/news/rss.xml',
+    #          'https://www.darkreading.com/rss.xml', 'https://www.eff.org/rss/updates.xml',
+    #          'https://torrentfreak.com/feed/', 'https://nakedsecurity.sophos.com/feed',
+    #          'http://feeds.feedburner.com/TheHackersNews?format=xml', 'https://www.cyberscoop.com/feed',
+    #          'https://krebsonsecurity.com/feed/', 'https://www.hackread.com/feed/',
+    #          'https://www.cyberscoop.com/feed/', 'https://seclists.org/rss/fulldisclosure.rss',
+    #          'https://www.exploit-db.com/rss.xml', 'https://www.grahamcluley.com/feed/',
+    #          'https://www.schneier.com/blog/atom.xml', 'https://www.bleepingcomputer.com/feed/',
+    #          'https://www.welivesecurity.com/feed', 'https://threatpost.com/feed']
     links = [
         'https://www.theregister.com/security/headlines.rss', 'https://www.zdnet.com/news/rss.xml',
         'https://www.darkreading.com/rss.xml', 'https://www.eff.org/rss/updates.xml',
@@ -22,7 +35,7 @@ def TextNews():
         'https://www.gironsec.com/blog/feed',
         'https://blog.kchung.co/rss/',
         'https://randywestergren.com/feed',
-        'https://www.webroot.com/blog/feed',
+        # 'https://www.webroot.com/blog/feed',
         'https://blog.zsec.uk/rss/',
         # 'https://digi.ninja/rss.xml',
         'https://blog.skullsecurity.org/feed',
@@ -62,7 +75,7 @@ def TextNews():
         # 'http://feeds.feedburner.com/Anti-virusRants?format=xml',
         'https://blog.shodan.io/rss/',
         'https://www.mdsec.co.uk/feed',
-        'https://www.trustwave.com/en-us/rss/trustwave-blog/',
+        # 'https://www.trustwave.com/en-us/rss/trustwave-blog/',
         'https://whitehatcheryl.com/feed',
         'https://www.jumpsec.com/feed',
         'https://dwaterson.com/feed',
@@ -132,11 +145,11 @@ def TextNews():
         'https://www.yubico.com/rss',
         'https://www.scriptjunkie.us/feed',
         'https://sensepost.com/rss.xml',
-        # 'https://sroberts.medium.com/feed',
+        'https://sroberts.medium.com/feed',
         'https://blog.mozilla.org/en/category/privacy-security/feed',
         'https://notsosecure.com/feed',
         'https://www.bluekaizen.org/feed',
-        # 'http://feeds.feedburner.com/SubliminalHacking?format=xml',
+        'http://feeds.feedburner.com/SubliminalHacking?format=xml',
         'https://blog.nviso.eu/feed',
         'https://www.hackmageddon.com/feed',
         'https://zeltser.com/feed',
@@ -159,13 +172,13 @@ def TextNews():
         'https://blog.mert.ninja/rss/',
         'https://www.kali.org/rss.xml',
         'http://www.weaknetlabs.com/feeds/posts/default?alt=rss',
-        # 'https://distrowatch.com/news/dw.xml',
+        'https://distrowatch.com/news/dw.xml',
         'https://tails.boum.org/news/index.en.rsss',
         'https://blog.linuxmint.com/?feed=rss2',
         'https://grahamcluley.com/feed',
         'https://newsroom.trendmicro.com/news-releases?pagetemplate=rss',
         'https://grahamcluley.com/feed',
-        # 'https://feeds.feedburner.com/TheHackersNews?format=xml',
+        'https://feeds.feedburner.com/TheHackersNews?format=xml',
         'https://msrc-blog.microsoft.com/feed',
         'https://iphelix.medium.com/feed',
         'https://seclists.org/rss/nmap-dev.rss',
@@ -197,23 +210,28 @@ def TextNews():
         'https://seclists.org/rss/nmap-dev.rss']
     for link in links:
         print(link)
-        source1: Response = requests.get(link)
-        soup1s = BeautifulSoup(source1.content, features='xml')
-        articles = soup1s.findAll('item')
-        i = 0
-        for article in articles:
-            link1 = article.link.text
-            headline = article.title.text
-            description = article.description.text
-
-            date = article.pubDate.text
-            date = (str(date))
-            link1 = (str(link1))
-            headline = (str(headline))
-            description = (str(description))
-            print(headline)
-            i = i + 1
-            insertintodatabase(link1, description, headline, date)
+        try:
+            source1: Response = requests.get(link)
+            soup1s = BeautifulSoup(source1.content, features='xml')
+            articles = soup1s.findAll('item')
+            i = 0
+            for article in articles:
+                link1 = article.link.text
+                headline = article.title.text
+                description = article.description.text
+                for div in soup1s.find_all('div', {'class': 'my_class'}):
+                    for p in div.find('p'):
+                        p.string.replace_with(p.string.strip())
+                date = article.pubDate.text
+                date = (str(date))
+                link1 = (str(link1))
+                headline = (str(headline))
+                description = (str(description))
+                print(headline)
+                i = i + 1
+                insertintodatabase(link1, description, headline, date)
+        except:
+            print("Failed to grab link, The website is most likely the issue.")
 
 
 def telegram_bot_sendtext(bot_message):
@@ -239,7 +257,9 @@ def insertintodatabase(link, description, headline, date):
     #     return
     c.execute("SELECT * FROM news")
     conn.close()
+    return
 
 
 while 1 == 1:
     TextNews()
+    time.sleep(60)
