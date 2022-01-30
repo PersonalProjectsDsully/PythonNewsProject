@@ -6,9 +6,35 @@ import sqlite3
 import logging
 
 from requests import Response
+#add status to check if the website is reachable before calling the function for the try and except
+#add seperate function to go through all of the links this will make it so once I perfect that I can just throw it in its own file and the lines would be reduced errors and debugging would be a lot easier
+
+
+def scrape(link):
+    source1: Response = requests.get(link)
+    soup1s = BeautifulSoup(source1.content, features='xml')
+    articles = soup1s.findAll('item')
+    i = 0
+    for article in articles:
+        link1 = article.link.text
+        headline = article.title.text
+        description = article.description.text
+        for div in soup1s.find_all('div', {'class': 'my_class'}):
+            for p in div.find('p'):
+                p.string.replace_with(p.string.strip())
+        date = article.pubDate.text
+        date = (str(date))
+        link1 = (str(link1))
+        headline = (str(headline))
+        description = (str(description))
+        print(headline)
+        i = i + 1
+        insertintodatabase(link1, description, headline, date)
+    return
 
 
 def TextNews():
+    x = 0
     logging.basicConfig(level=logging.CRITICAL)
     # links = ['https://www.theregister.com/security/headlines.rss', 'https://www.zdnet.com/news/rss.xml',
     #          'https://www.darkreading.com/rss.xml', 'https://www.eff.org/rss/updates.xml',
@@ -211,27 +237,13 @@ def TextNews():
     for link in links:
         print(link)
         try:
-            source1: Response = requests.get(link)
-            soup1s = BeautifulSoup(source1.content, features='xml')
-            articles = soup1s.findAll('item')
-            i = 0
-            for article in articles:
-                link1 = article.link.text
-                headline = article.title.text
-                description = article.description.text
-                for div in soup1s.find_all('div', {'class': 'my_class'}):
-                    for p in div.find('p'):
-                        p.string.replace_with(p.string.strip())
-                date = article.pubDate.text
-                date = (str(date))
-                link1 = (str(link1))
-                headline = (str(headline))
-                description = (str(description))
-                print(headline)
-                i = i + 1
-                insertintodatabase(link1, description, headline, date)
+            scrape(link)
         except:
-            print("Failed to grab link, The website is most likely the issue.")
+            if x ==0:
+                time.sleep(5)
+                scrape(link)
+                #try again add check again after checking for five seconds if else just skip the next look
+                print("Failed to grab link, The website is most likely the issue.")
 
 
 def telegram_bot_sendtext(bot_message):
@@ -263,3 +275,5 @@ def insertintodatabase(link, description, headline, date):
 while 1 == 1:
     TextNews()
     time.sleep(60)
+
+
